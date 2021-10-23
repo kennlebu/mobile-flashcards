@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { green, lightGreen, red, veryLightGreen, white } from '../utils/colors';
+import { gray, green, lightGreen, red, veryLightGreen, white } from '../utils/colors';
 
 const styles = StyleSheet.create({
     container: {
@@ -45,6 +45,23 @@ const styles = StyleSheet.create({
         paddingLeft: 100,
         paddingRight: 100
     },
+    outlineBtn: {
+        borderColor: green,
+        borderWidth: 1,
+        borderRadius: 3,
+        padding: 8,
+        paddingLeft: 40,
+        paddingRight: 40
+    },
+    incorrectBtn: {
+        backgroundColor: red,
+        borderColor: red,
+        borderWidth: 1,
+        borderRadius: 3,
+        padding: 8,
+        paddingLeft: 100,
+        paddingRight: 100
+    },
     btnFont: {
         fontSize: 16
     },
@@ -68,6 +85,23 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'end',
         paddingBottom: 40
+    },
+    quizCounter: {
+        alignItems: 'start',
+        justifyContent: 'start'
+    },
+    quizCard: {
+        flex: 1,
+        alignItems: 'center',
+        marginTop: 50,
+        marginBottom: 50,
+        padding: 20,
+        height: 400,
+        borderStyle: 'solid',
+        borderColor: green,
+        borderRadius: 3,
+        backgroundColor: '#BED1B6',
+        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;'
     }
 })
 

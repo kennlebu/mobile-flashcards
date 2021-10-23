@@ -18,7 +18,7 @@ export default function App() {
       <View style={{flex: 1}}>
         <StatusBar translucent backgroundColor={green} barStyle='default' />
         
-        <NewDeck />
+        <Quiz />
       </View>
     </Provider>
     
