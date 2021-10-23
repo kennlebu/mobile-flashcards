@@ -9,6 +9,8 @@ import DeckList from './components/DeckList';
 import decks from './reducers';
 import { green } from './utils/colors';
 import middleware from './middleware';
+import Quiz from './components/Quiz';
+import NewDeck from './components/NewDeck';
 
 export default function App() {
   return (
@@ -16,7 +18,7 @@ export default function App() {
       <View style={{flex: 1}}>
         <StatusBar translucent backgroundColor={green} barStyle='default' />
         
-        <AddCard />
+        <NewDeck />
       </View>
     </Provider>
     
