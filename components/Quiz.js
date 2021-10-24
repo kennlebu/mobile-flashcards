@@ -4,15 +4,15 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import styles from "../styles";
 import { red, white } from "../utils/colors";
-import { answerQuestion } from "../utils/helpers";
-import { answerQuestion as answerQuestionAction } from '../actions'
+import { handleAnswerQuestion } from '../actions'
 import Score from "./Score";
+import { clearLocalNotification, getDeck, setLocalNotification } from "../utils/helpers";
 
 class Quiz extends Component {
     state = {
         screen: 'question',
         animatedValue: new Animated.Value(0),
-        currentQn: null,
+        currentQn: {question: '', answer: ''},
         ready: false,
         deck: null,
         numAnswered: 0
@@ -24,20 +24,6 @@ class Quiz extends Component {
     }
 
     toggleView = () => {
-        if(this.value >= 90) {
-            Animated.spring(this.state.animatedValue, {
-                toValue: 0,
-                friction: 8,
-                tension: 10
-            }).start()
-        } else {
-            Animated.timing(this.state.animatedValue, {
-                toValue: 180,
-                friction: 8,
-                tension: 10
-            }).start()
-        }
-
         this.setState((prevState) => ({
             screen: prevState.screen === 'question' ? 'answer' : 'question'
         }))
@@ -46,11 +32,9 @@ class Quiz extends Component {
     answerQuestion = (question, answer) => {
         const answerObject = {question, answer}
         const title = this.state.deck.title
-        answerQuestion(title, answerObject)
-            .then(() => {
-                this.props.dispatch(answerQuestionAction(title, answerObject))
-                this.getNextQuestion()
-            })
+        
+        this.props.dispatch(handleAnswerQuestion(title, answerObject))
+        this.getNextQuestion()
     }
 
     getNextQuestion = () => {
@@ -59,69 +43,47 @@ class Quiz extends Component {
 
         if(deck.questions.length <= 0) {
             this.setState(() => ({
-                screen: 'empty'
+                screen: 'empty',
+                ready: true
             }))
-            return
-        }
-
-        let numAnswered = 0;
-        const current = deck.questions.find((question) => {
-            if(deck.answers.length <= 0) {
-                return {question}
-            }
-            for(let answer of deck.answers) {
-                if(answer.question === question.question) {
-                    numAnswered += 1
-                    continue
+        } else {
+            let numAnswered = 0;
+            const current = deck.questions.find((question) => {
+                if(deck.answers.length <= 0) {
+                    return question
                 }
+                for(let answer of deck.answers) {
+                    if(answer.question === question.question) {
+                        numAnswered += 1
+                        continue
+                    }
+                    this.setState(() => ({
+                        numAnswered
+                    }));
+                    return question
+                }
+            });
+    
+            if((numAnswered + 1) >= deck.questions.length) {
+                // this.props.navigation.navigate('Score', {deck})
                 this.setState(() => ({
-                    numAnswered
-                }));
-                return {question}
+                    screen: 'score',
+                    ready: true
+                }))
             }
-        });
-
-        console.log('Answered: ', this.state)
-
-        if((numAnswered + 1) >= deck.questions.length) {
-            // this.props.navigation.navigate('Score', {deck})
-            this.setState(() => ({
-                screen: 'score'
-            }))
-            return
-        } 
-
-        this.setState(() => ({
-            currentQn: current,
-            ready: true,
-            deck
-        }))
+            else {
+                this.setState(() => ({
+                    screen: 'question',
+                    currentQn: current,
+                    ready: true,
+                    deck
+                }))
+            }  
+        }
     }
 
     render() {
         const { currentQn, ready, deck, numAnswered } = this.state;
-
-        this.state.animatedValue.addListener(({value}) => {
-            this.value = value
-        })      
-        const frontInterpolate = this.state.animatedValue.interpolate({
-            inputRange: [0, 180],
-            outputRange: ['0deg', '180deg']
-        }),
-        backInterpolate = this.state.animatedValue.interpolate({
-            inputRange: [0, 180],
-            outputRange: ['180deg', '360deg']
-        })
-        const frontAnimationStyle = {
-            transform: [
-                {rotateY: frontInterpolate}
-            ]
-        }
-        const backAnimationStyle = {
-            transform: [
-                {rotateY: backInterpolate}
-            ]
-        }
 
         return (
             <View style={styles.container}>
@@ -138,35 +100,29 @@ class Quiz extends Component {
                         </View>
                         
                         {this.state.screen === 'question' ?
-                        <View>
-                            <Animated.View style={[styles.quizCard, {backfaceVisibility: 'hidden'}, frontAnimationStyle]}>
-                                <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
-                                    {currentQn.question}
-                                </Text>
-
-                                <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
-                                    <Text style={{color: red, fontSize: 16}}>
-                                        Show Answer
-                                    </Text>
-                                </TouchableOpacity>
-                            </Animated.View>
+                        <View style={styles.quizCard}>
+                            <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
+                                {currentQn.question}
+                            </Text>
                         </View>
 
                         :
 
                         <View>
-                            <Animated.View style={[styles.quizCard, backAnimationStyle]}>
+                            <View style={styles.quizCard}>
                                 <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
                                     {currentQn.answer}
                                 </Text>
+                            </View>
+                        </View>}                        
 
-                                <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
-                                    <Text style={{color: red, fontSize: 16}}>
-                                        Show Question
-                                    </Text>
-                                </TouchableOpacity>
-                            </Animated.View>
-                        </View>}
+                        <TouchableOpacity 
+                            style={[styles.outlineBtn, styles.center, {marginTop: 4, marginBottom: 50}]} 
+                            onPress={this.toggleView}>
+                            <Text style={{color: red, fontSize: 16}}>
+                                Show {this.state.screen === 'question' ? 'Answer' : 'Question'}
+                            </Text>
+                        </TouchableOpacity>
 
                         <View style={[styles.center, {marginBottom: 40}]}>
                             <TouchableOpacity 
@@ -193,7 +149,7 @@ class Quiz extends Component {
 function NoQuestions () {
     return (
         <View style={styles.center}>
-            <Text style={{textAlign: 'center'}}>
+            <Text style={{textAlign: 'center', fontSize: 26}}>
                 This deck does not have any questions yet.
             </Text>
         </View>

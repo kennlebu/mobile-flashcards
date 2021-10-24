@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { connect } from 'react-redux'
-import { deleteDeck, handleDeleteDeck } from '../actions'
+import { handleDeleteDeck } from '../actions'
 import styles from '../styles'
 import { red, white } from '../utils/colors'
-import { getDeck, removeEntry } from '../utils/helpers'
+import { getDeck } from '../utils/helpers'
 
 class Deck extends Component {
     state = {

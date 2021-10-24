@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import { FlatList, ScrollView, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { connect } from "react-redux";
-import { handleReceiveDecks, receiveDecks } from "../actions";
+import { handleReceiveDecks } from "../actions";
 import styles from "../styles";
-import { getDecks } from "../utils/helpers";
 import DeckListItem from "./DeckListItem";
 
 class DeckList extends Component {
@@ -25,7 +24,6 @@ class DeckList extends Component {
     }
 
     const renderItem = ({item}) => {
-      console.log('RENDER: ', item)
        return <DeckListItem
         key={item.title}
         deck={item} 

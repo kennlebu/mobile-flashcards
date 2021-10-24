@@ -89,18 +89,17 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     quizCard: {
-        flex: 1,
+        // flex: 1,
         alignItems: 'center',
         marginTop: 50,
-        marginBottom: 50,
+        marginBottom: 10,
         padding: 20,
-        height: 400,
+        minHeight: 200,
         borderStyle: 'solid',
         borderColor: green,
         borderRadius: 3,
         backgroundColor: '#BED1B6',
         elevation: 1
-        // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px'
     }
 })
 
