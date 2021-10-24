@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { addDeckTitle } from "../actions";
 import styles from "../styles";
 import { white } from "../utils/colors";
+import { saveDeckTitle } from "../utils/helpers";
 
 class NewDeck extends Component {
     state = {
@@ -18,9 +19,14 @@ class NewDeck extends Component {
             alert('You must enter a title')
         }
         else {
-            this.props.dispatch(addDeckTitle(title));
-
-            this.setState(() => ({title: ''}));
+            saveDeckTitle(title)
+                .then(() => {
+                    this.props.dispatch(addDeckTitle(title));
+                    this.props.navigation.navigate('Deck', { title })
+                    this.setState(() => ({title: ''}));
+                })
+                .catch((error) => console.warn('Failed to add Deck title: ', error))
+            
         }        
     }
 

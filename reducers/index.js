@@ -1,4 +1,4 @@
-import { ADD_CARD, ADD_TITLE, RECEIVE_DECKS } from "../actions";
+import { ADD_CARD, ADD_TITLE, ANSWER_QUESTION, DELETE_DECK, RECEIVE_DECKS, RESTART_QUIZ } from "../actions";
 
 
 function decks(state = {}, action) {
@@ -11,7 +11,11 @@ function decks(state = {}, action) {
         case ADD_TITLE:
             return {
                 ...state,
-                [action.title]: {title: action.title}
+                [action.title]: {
+                    title: action.title,
+                    questions: [],
+                    answers: []
+                }
             }
         case ADD_CARD:
             return {
@@ -20,6 +24,29 @@ function decks(state = {}, action) {
                     ...state[action.title],
                     questions: state[action.title].questions.concat([action.card])
 
+                }
+            }
+        case DELETE_DECK:
+            return Object.keys(state)
+                .filter(key => key !== action.title)
+                .reduce((result, current) => {
+                    result[current] = state[current];
+                    return result;
+                }, {});
+        case ANSWER_QUESTION:
+            return {
+                ...state,
+                [action.title]: {
+                    ...state[action.title],
+                    answers: state[action.title].answers.concat([action.answer])
+                }
+            }
+        case RESTART_QUIZ:
+            return {
+                ...state,
+                [action.title]: {
+                    ...state[action.title],
+                    answers: []
                 }
             }
         default: 

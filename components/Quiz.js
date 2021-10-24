@@ -1,15 +1,27 @@
 import React, { Component } from "react";
 import { Animated, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { connect } from "react-redux";
 import styles from "../styles";
 import { red, white } from "../utils/colors";
+import { answerQuestion } from "../utils/helpers";
+import { answerQuestion as answerQuestionAction } from '../actions'
+import Score from "./Score";
 
 class Quiz extends Component {
     state = {
         screen: 'question',
-        animatedValue: new Animated.Value(0)
+        animatedValue: new Animated.Value(0),
+        currentQn: null,
+        ready: false,
+        deck: null,
+        numAnswered: 0
     }
     value = 0;
+
+    componentDidMount() {
+        this.getNextQuestion()
+    }
 
     toggleView = () => {
         if(this.value >= 90) {
@@ -31,7 +43,64 @@ class Quiz extends Component {
         }))
     }
 
+    answerQuestion = (question, answer) => {
+        const answerObject = {question, answer}
+        const title = this.state.deck.title
+        answerQuestion(title, answerObject)
+            .then(() => {
+                this.props.dispatch(answerQuestionAction(title, answerObject))
+                this.getNextQuestion()
+            })
+    }
+
+    getNextQuestion = () => {
+        const { route } = this.props;
+        const { deck } = route.params;
+
+        if(deck.questions.length <= 0) {
+            this.setState(() => ({
+                screen: 'empty'
+            }))
+            return
+        }
+
+        let numAnswered = 0;
+        const current = deck.questions.find((question) => {
+            if(deck.answers.length <= 0) {
+                return {question}
+            }
+            for(let answer of deck.answers) {
+                if(answer.question === question.question) {
+                    numAnswered += 1
+                    continue
+                }
+                this.setState(() => ({
+                    numAnswered
+                }));
+                return {question}
+            }
+        });
+
+        console.log('Answered: ', this.state)
+
+        if((numAnswered + 1) >= deck.questions.length) {
+            // this.props.navigation.navigate('Score', {deck})
+            this.setState(() => ({
+                screen: 'score'
+            }))
+            return
+        } 
+
+        this.setState(() => ({
+            currentQn: current,
+            ready: true,
+            deck
+        }))
+    }
+
     render() {
+        const { currentQn, ready, deck, numAnswered } = this.state;
+
         this.state.animatedValue.addListener(({value}) => {
             this.value = value
         })      
@@ -56,52 +125,79 @@ class Quiz extends Component {
 
         return (
             <View style={styles.container}>
-                <View style={styles.quizCounter}>
-                    <Text>Question 2 of 2</Text>
-                </View>
-                
-                {this.state.screen === 'question' ?
-                <View>
-                    <Animated.View style={[styles.quizCard, {backfaceVisibility: 'hidden'}, frontAnimationStyle]}>
-                        <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
-                            Does React Native work with Android?
-                        </Text>
+                {ready
+                ? <View>
+                    {this.state.screen === 'empty'
+                    ? <NoQuestions />
+                    : this.state.screen === 'score' ?
+                    <Score deck={deck} />
+                    :
+                    <View>
+                        <View style={styles.quizCounter}>
+                            <Text>Question {numAnswered + 1} of {deck.questions.length}</Text>
+                        </View>
+                        
+                        {this.state.screen === 'question' ?
+                        <View>
+                            <Animated.View style={[styles.quizCard, {backfaceVisibility: 'hidden'}, frontAnimationStyle]}>
+                                <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
+                                    {currentQn.question}
+                                </Text>
 
-                        <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
-                            <Text style={{color: red, fontSize: 16}}>
-                                Show Answer
-                            </Text>
-                        </TouchableOpacity>
-                    </Animated.View>
-                </View>
+                                <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
+                                    <Text style={{color: red, fontSize: 16}}>
+                                        Show Answer
+                                    </Text>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        </View>
 
+                        :
+
+                        <View>
+                            <Animated.View style={[styles.quizCard, backAnimationStyle]}>
+                                <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
+                                    {currentQn.answer}
+                                </Text>
+
+                                <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
+                                    <Text style={{color: red, fontSize: 16}}>
+                                        Show Question
+                                    </Text>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        </View>}
+
+                        <View style={[styles.center, {marginBottom: 40}]}>
+                            <TouchableOpacity 
+                                style={[styles.accentBtn, styles.center, {width: 300, marginBottom: 8}]}
+                                onPress={() => this.answerQuestion(currentQn.question, 'correct')}>
+                                <Text style={[styles.btnFont, {color: white}]}>Correct</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={[styles.incorrectBtn, styles.center, {width: 300}]}
+                                onPress={() => this.answerQuestion(currentQn.question, 'Incorrect')}>
+                                <Text style={[styles.btnFont, {color: white}]}>Incorrect</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    }
+                </View>
                 :
-
-                <View>
-                    <Animated.View style={[styles.quizCard, backAnimationStyle]}>
-                        <Text style={{fontSize: 24, marginBottom: 14, textAlign: 'center'}}>
-                            Yes!
-                        </Text>
-
-                        <TouchableOpacity style={styles.outlineBtn} onPress={this.toggleView}>
-                            <Text style={{color: red, fontSize: 16}}>
-                                Show Question
-                            </Text>
-                        </TouchableOpacity>
-                    </Animated.View>
-                </View>}
-
-                <View style={[styles.center, {marginBottom: 40}]}>
-                    <TouchableOpacity style={[styles.accentBtn, {width: 300, marginBottom: 8}]}>
-                        <Text style={[styles.btnFont, {color: white}]}>Correct</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.incorrectBtn, {width: 300}]}>
-                        <Text style={[styles.btnFont, {color: white}]}>Incorrect</Text>
-                    </TouchableOpacity>
-                </View>
+                <Text>Loading...</Text>}
             </View>
         );
     }
 }
 
-export default Quiz;
+function NoQuestions () {
+    return (
+        <View style={styles.center}>
+            <Text style={{textAlign: 'center'}}>
+                This deck does not have any questions yet.
+            </Text>
+        </View>
+    )
+}
+
+export default connect()(Quiz);

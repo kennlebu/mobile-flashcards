@@ -5,14 +5,17 @@ import styles from "../styles";
 
 export default function DeckListItem(props) {
     const { title, questions } = props.deck
+    const { navigate } = props
+    console.log("ITEM:: ", props)
+
 
     return (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigate()}>
             <View style={styles.deckListItem}>
-                <Text style={{fontSize: 16}}>{title}</Text>
-                <Text style={{fontSize: 12}}>
-                    {questions.length} Card{questions.length > 1 && 's'}
-                </Text>
+                <Text style={{fontSize: 26}}>{title}</Text>
+                {questions  && <Text style={{fontSize: 16}}>
+                    {questions.length} card{(questions.length > 1 || questions.length === 0) && 's'}
+                </Text>}
             </View>
         </TouchableOpacity>        
     )

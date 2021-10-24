@@ -17,15 +17,15 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingLeft: 16,
         paddingRight: 16,
-        paddingTop: 4,
-        paddingBottom: 4,
+        paddingTop: 8,
+        paddingBottom: 8,
         justifyContent: 'center',
         alignItems: 'flex-start',
-        borderColor: 'black',
-        borderStyle: 'solid',
-        borderWidth: 1,
         borderRadius: 2,
-        marginBottom: 4
+        marginBottom: 12,
+        backgroundColor: '#FAFFF7',
+        elevation: 1
+        // boxShadow: 'rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px'
     },
     primaryBtn: {
         backgroundColor: white,
@@ -71,8 +71,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 3,
         padding: 10,
-        flexDirection: 'row',
-        flex: 1,
         backgroundColor: white
     },
     newDeckTitle: {
@@ -83,12 +81,12 @@ const styles = StyleSheet.create({
     },
     newDeckActions: {
         flex: 1,
-        justifyContent: 'end',
+        justifyContent: 'flex-end',
         paddingBottom: 40
     },
     quizCounter: {
-        alignItems: 'start',
-        justifyContent: 'start'
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start'
     },
     quizCard: {
         flex: 1,
@@ -101,7 +99,8 @@ const styles = StyleSheet.create({
         borderColor: green,
         borderRadius: 3,
         backgroundColor: '#BED1B6',
-        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;'
+        elevation: 1
+        // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px'
     }
 })
 

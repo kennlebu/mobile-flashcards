@@ -1,27 +1,53 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import AddCard from './components/AddCard';
-import Deck from './components/Deck';
 import DeckList from './components/DeckList';
+import Deck from './components/Deck';
+import Quiz from './components/Quiz';
+import Score from './components/Score';
 import decks from './reducers';
 import { green } from './utils/colors';
 import middleware from './middleware';
-import Quiz from './components/Quiz';
 import NewDeck from './components/NewDeck';
-import Score from './components/Score';
+import AddCard from './components/AddCard';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Constants from 'expo-constants';
+
+const Tab = Platform.OS === 'ios'
+  ? createBottomTabNavigator()
+  : createMaterialTopTabNavigator()
+
+const Main = createNativeStackNavigator();
+
+function Home() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name='Decks' component={DeckList} />
+      <Tab.Screen name='Add Deck' component={NewDeck} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <Provider store={createStore(decks, middleware)}>
-      <View style={{flex: 1}}>
-        <StatusBar translucent backgroundColor={green} barStyle='default' />
-        
-        <Score />
-      </View>
-    </Provider>
-    
+      <NavigationContainer>
+        <View style={{height: Constants.statusBarHeight}}>
+          <StatusBar translucent backgroundColor={green} barStyle='default' />
+        </View>
+        <Main.Navigator>
+          <Main.Screen name='Home' component={Home} options={{ headerShown: false }} />
+          <Main.Screen name='Deck' component={Deck} />
+          <Main.Screen name='AddCard' component={AddCard} />
+          <Main.Screen name='Quiz' component={Quiz} />
+          <Main.Screen name='Score' component={Score} />
+        </Main.Navigator>
+      </NavigationContainer>
+    </Provider>    
   );
 }

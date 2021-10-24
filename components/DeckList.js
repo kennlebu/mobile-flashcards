@@ -1,40 +1,49 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { FlatList, ScrollView, Text, View } from "react-native";
 import { connect } from "react-redux";
+import { handleReceiveDecks, receiveDecks } from "../actions";
+import styles from "../styles";
+import { getDecks } from "../utils/helpers";
 import DeckListItem from "./DeckListItem";
 
 class DeckList extends Component {
+  state = {
+    loading: true,
+    decks: []
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props
+      dispatch(handleReceiveDecks())
+  }
+
   render() {
-    const decks = {
-      React: {
-        title: "React",
-        questions: [
-          {
-            question: "What is React?",
-            answer: "A library for managing user interfaces",
-          },
-          {
-            question: "Where do you make Ajax requests in React?",
-            answer: "The componentDidMount lifecycle event",
-          },
-        ],
-      },
-      JavaScript: {
-        title: "JavaScript",
-        questions: [
-          {
-            question: "What is a closure?",
-            answer:
-              "The combination of a function and the lexical environment within which that function was declared.",
-          },
-        ],
-      },
-    };
+    const { decks } = this.props
+
+    const myKeyExtractor = (deck) => {
+      return deck.title
+    }
+
+    const renderItem = ({item}) => {
+      console.log('RENDER: ', item)
+       return <DeckListItem
+        key={item.title}
+        deck={item} 
+        navigate={() => this.props.navigation.navigate('Deck', { title: item.title })} />
+    }
+
     return (
-      <View>
-        {Object.keys(decks).map((key) => (
-            <DeckListItem key={key} deck={decks[key]} />
-        ))}
+      <View style={styles.container}>
+        {Object.keys(decks).length >= 1
+          ? <FlatList
+            data={Object.values(decks)} 
+            keyExtractor={myKeyExtractor} 
+            renderItem={renderItem} 
+            extraData={this.props.decks} />
+          :
+          <Text style={[styles.center, {fontSize: 28, textAlign: 'center'}]}>
+            You have not added any decks yet.
+          </Text>}
       </View>
     );
   }
