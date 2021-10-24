@@ -49,6 +49,11 @@ function decks(state = {}, action) {
                     answers: []
                 }
             }
+        case SELECT_DECK:
+            return {
+                ...state,
+                _selected: action.deck
+            }
         default: 
             return state
     }

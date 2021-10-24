@@ -95,11 +95,6 @@ export function setLocalNotification() {
                 tomorrow.setMinutes(30)
 
                 Notifications.scheduleNotificationAsync(
-                //   {content: createNotification()},
-                //   trigger: {
-                //     time: tomorrow,
-                //     repeat: 'day',
-                //   }
                   { content: createNotification(), trigger: {
                     time: tomorrow,
                     repeat: 'day',

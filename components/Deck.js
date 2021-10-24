@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { connect } from 'react-redux'
-import { handleDeleteDeck } from '../actions'
+import { handleDeleteDeck, selectDeck } from '../actions'
 import styles from '../styles'
 import { red, white } from '../utils/colors'
 import { getDeck } from '../utils/helpers'
@@ -14,11 +14,12 @@ class Deck extends Component {
     }
 
     componentDidMount () {
-        const { route } = this.props;
+        const { route, dispatch } = this.props;
         const { title } = route.params;
 
         getDeck(title)
             .then((deck) => {
+                // dispatch(selectDeck(deck))
                 this.setState(() => ({
                 deck,
                 ready: true

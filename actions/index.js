@@ -1,4 +1,4 @@
-import { addCardToDeck, answerQuestion, getDeck, getDecks, removeEntry } from "../utils/helpers";
+import { addCardToDeck, answerQuestion, getDeck, getDecks, removeEntry, restartQuiz } from "../utils/helpers";
 
 export const RECEIVE_DECKS = "RECEIVE_DECKS";
 export const ADD_TITLE = "ADD_TITLE";
@@ -83,4 +83,19 @@ export function restartQuizAction(title) {
     type: RESTART_QUIZ,
     title,
   };
+}
+
+export function handleRestartQuiz(title) {
+    return (dispatch) => {
+        restartQuiz(title).then(() => {
+            dispatch(restartQuizAction(title))
+        })
+    }
+}
+
+export function selectDeck(deck) {
+    return {
+        type: SELECT_DECK,
+        deck
+    }
 }

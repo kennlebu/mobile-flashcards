@@ -9,33 +9,36 @@ import { restartQuiz } from "../utils/helpers";
 
 class Score extends Component {
     doRestartQuiz = (deck) => {
-        restartQuiz(deck.title)
-            .then(this.props.dispatch(restartQuizAction(deck.title)))
-            .then(this.props.navigation.navigate('Quiz', {deck}))
+        if(deck) {
+            restartQuiz(deck.title)
+                .then(this.props.dispatch(restartQuizAction(deck.title)))
+                .then(this.props.navigation.navigate('Quiz', {deck}))
+        }
+        
     }
 
     render () {
         // const { route, navigation } = this.props;
         // const { deck } = route.params; 
-        const { deck } = this.props
+        const { deck, backToDeck, restartQuiz } = this.props
         
-        const numQuestions = deck.questions.length
-        const correct = deck.answers.filter((answer) => answer.answer === 'correct').length
+        const numQuestions = deck ? deck.questions.length : 0
+        const correct = deck ? deck.answers.filter((answer) => answer.answer === 'correct').length : 0
 
         return (
-            <View style={[styles.container, styles.center]}>
+            <View>
                 <Text style={{fontSize: 18}}>Score:</Text>
                 <Text style={{fontSize: 40}}>{correct}/{numQuestions}</Text>
                 <View style={{marginTop: 60}}>
                     <TouchableOpacity 
                         style={[styles.accentBtn, styles.center, {marginBottom: 8}]}
-                        onPress={this.doRestartQuiz(deck)}>
+                        onPress={restartQuiz}>
                         <Text style={[styles.btnFont, {color: white}]}>Restart Quiz</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
                         style={[styles.outlineBtn, styles.center]}
-                        onPress={() => navigation.navigate('Deck', { title: deck.title})}>
+                        onPress={backToDeck}>
                         <Text style={styles.btnFont}>Back to Deck</Text>
                     </TouchableOpacity>
                 </View>
@@ -44,10 +47,10 @@ class Score extends Component {
     }
 }
 
-function mapStateToProps({deck}) {
-    return {
-        deck
-    }
-}
+// function mapStateToProps({deck}) {
+//     return {
+//         deck
+//     }
+// }
 
-export default connect(mapStateToProps)(Score);
+export default connect()(Score);

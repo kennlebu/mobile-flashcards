@@ -4,9 +4,9 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import styles from "../styles";
 import { red, white } from "../utils/colors";
-import { handleAnswerQuestion } from '../actions'
+import { handleAnswerQuestion, handleRestartQuiz, restartQuizAction } from '../actions'
 import Score from "./Score";
-import { clearLocalNotification, getDeck, setLocalNotification } from "../utils/helpers";
+import { clearLocalNotification, getDeck, restartQuiz, setLocalNotification } from "../utils/helpers";
 
 class Quiz extends Component {
     state = {
@@ -29,11 +29,29 @@ class Quiz extends Component {
         }))
     }
 
+    backToDeck = () => {
+        const { route } = this.props;
+        const { deck } = route.params;
+        this.props.navigation.navigate('Deck', {title: deck.title})
+    }
+
+    restartQuiz = () => {
+        const { route } = this.props;
+        const { deck } = route.params;
+        this.props.dispatch(handleRestartQuiz(deck.title))
+        this.props.navigation.navigate('Quiz', {deck})
+    }
+
     answerQuestion = (question, answer) => {
         const answerObject = {question, answer}
         const title = this.state.deck.title
         
         this.props.dispatch(handleAnswerQuestion(title, answerObject))
+        const newDeck = Object.assign({}, this.state.deck)
+        newDeck.answers.push(answerObject)
+        this.setState(() => ({
+            deck: newDeck
+        }))
         this.getNextQuestion()
     }
 
@@ -42,11 +60,13 @@ class Quiz extends Component {
         const { deck } = route.params;
 
         if(deck.questions.length <= 0) {
+            console.log("NOT HERE1")
             this.setState(() => ({
                 screen: 'empty',
                 ready: true
             }))
         } else {
+            console.log("NOT HERE2")
             let numAnswered = 0;
             const current = deck.questions.find((question) => {
                 if(deck.answers.length <= 0) {
@@ -64,7 +84,8 @@ class Quiz extends Component {
                 }
             });
     
-            if((numAnswered + 1) >= deck.questions.length) {
+            if((numAnswered) >= deck.questions.length) {
+                console.log("NOT HERE3")
                 // this.props.navigation.navigate('Score', {deck})
                 this.setState(() => ({
                     screen: 'score',
@@ -72,6 +93,7 @@ class Quiz extends Component {
                 }))
             }
             else {
+                console.log("NOT HERE4")
                 this.setState(() => ({
                     screen: 'question',
                     currentQn: current,
@@ -92,7 +114,7 @@ class Quiz extends Component {
                     {this.state.screen === 'empty'
                     ? <NoQuestions />
                     : this.state.screen === 'score' ?
-                    <Score deck={deck} />
+                    <Score deck={deck} backToDeck={this.backToDeck} restartQuiz={restartQuiz} />
                     :
                     <View>
                         <View style={styles.quizCounter}>
