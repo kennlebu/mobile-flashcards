@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
-import { addDeckTitle } from "../actions";
+import { addDeckTitle, selectDeck } from "../actions";
 import styles from "../styles";
 import { white } from "../utils/colors";
 import { saveDeckTitle } from "../utils/helpers";
@@ -22,7 +22,8 @@ class NewDeck extends Component {
             saveDeckTitle(title)
                 .then(() => {
                     this.props.dispatch(addDeckTitle(title));
-                    this.props.navigation.navigate('Deck', { title })
+                    this.props.dispatch(selectDeck(title));
+                    this.props.navigation.navigate('Deck', { title, refresh: true })
                     this.setState(() => ({title: ''}));
                 })
                 .catch((error) => console.warn('Failed to add Deck title: ', error))

@@ -6,53 +6,72 @@ function decks(state = {}, action) {
         case RECEIVE_DECKS:
             return {
                 ...state,
-                ...action.decks
+                decks: {
+                    ...action.decks
+                }
             }
         case ADD_TITLE:
             return {
                 ...state,
-                [action.title]: {
-                    title: action.title,
-                    questions: [],
-                    answers: []
+                decks: {
+                    ...state.decks,
+                    [action.title]: {
+                        title: action.title,
+                        questions: [],
+                        answers: []
+                    }
                 }
             }
         case ADD_CARD:
             return {
                 ...state,
-                [action.title]: {
-                    ...state[action.title],
-                    questions: state[action.title].questions.concat([action.card])
-
+                decks: {
+                    ...state.decks,
+                    [action.title]: {
+                        ...state.decks[action.title],
+                        questions: state.decks[action.title].questions.concat([action.card])
+    
+                    }
                 }
             }
         case DELETE_DECK:
-            return Object.keys(state)
-                .filter(key => key !== action.title)
-                .reduce((result, current) => {
-                    result[current] = state[current];
-                    return result;
-                }, {});
+            let newDecks = Object.assign({}, state.decks)
+            delete newDecks[action.title]
+            return {
+                ...state,
+                decks: {
+                    ...newDecks
+                }
+            }
         case ANSWER_QUESTION:
             return {
                 ...state,
-                [action.title]: {
-                    ...state[action.title],
-                    answers: state[action.title].answers.concat([action.answer])
+                decks: {
+                    ...state.decks,
+                    [action.title]: {
+                        ...state.decks[action.title],
+                        answers: state.decks[action.title].answers.concat([action.answer])
+                    }
                 }
             }
         case RESTART_QUIZ:
             return {
                 ...state,
-                [action.title]: {
-                    ...state[action.title],
-                    answers: []
+                decks: {
+                    ...state.decks,
+                    [action.title]: {
+                        ...state.decks[action.title],
+                        answers: []
+                    }
                 }
+                
             }
         case SELECT_DECK:
             return {
                 ...state,
-                _selected: action.deck
+                _selected_: {
+                    ...state.decks[action.title]
+                }
             }
         default: 
             return state

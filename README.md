@@ -17,3 +17,5 @@ This application was created using `create-react-native-app` and tested using Ex
 This app was tested on an Android device (Xiaomi Mi 9T Pro) using Expo Go.
 
 The app was run using `expo start`. Some dependencies are specific to the Expo version so be sure to run `expo install` should you encounter version incompatibility issues.
+
+The card flip animation was made using a tutorial by [Jason Brown](https://codedaily.io/tutorials/Create-a-Flip-Card-Animation-with-React-Native)

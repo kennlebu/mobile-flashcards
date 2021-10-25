@@ -24,14 +24,15 @@ class AddCard extends Component {
 
   submitCard = () => {
     const { question, answer, title } = this.state;
+    const { dispatch, navigation } = this.props;
 
     if (question.length <= 0) {
       alert("Please enter a question");
     } else if (answer.length <= 0) {
       alert("Please enter an answer");
     } else {
-      this.props.dispatch(handleAddCardToDeck(title, { question, answer }));
-      this.props.navigation.navigate("Deck", { title, refresh: true });
+      dispatch(handleAddCardToDeck(title, { question, answer }));
+      navigation.navigate("Deck");
     }
   };
 
@@ -70,10 +71,4 @@ class AddCard extends Component {
   }
 }
 
-function mapStateToProps({ title }) {
-  return {
-    title,
-  };
-}
-
-export default connect(mapStateToProps)(AddCard);
+export default connect()(AddCard);

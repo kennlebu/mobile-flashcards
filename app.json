@@ -5,7 +5,10 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "org.lebudev.flashcards"
+    }
   },
   "name": "mobile-flashcards"
 }

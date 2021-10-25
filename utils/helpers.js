@@ -7,17 +7,25 @@ export const NOTIFICATION_KEY = 'mobile-flashcards:notifications'
 
 export function getDecks () {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
-        .then((results) => JSON.parse(results))
+        .then((results) => {
+          const data = JSON.parse(results)
+          return data.decks || {}
+        })
 }
 
 export function getDeck (id) {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
-            .then((results) => JSON.parse(results)[id])
+            .then((results) => {
+              const data = JSON.parse(results)
+              return data.decks[id] || {}
+            })
 }
 
 export function saveDeckTitle(title) {
     return AsyncStorage.mergeItem(DECKS_STORAGE_KEY, JSON.stringify({
-        [title]: {title, questions: [], answers: []},
+        decks: {
+          [title]: {title, questions: [], answers: []},
+        }
     }))
 }
 
@@ -25,7 +33,7 @@ export function addCardToDeck(title, card) {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
         .then((results) => {
             const data = JSON.parse(results)
-            data[title].questions.push(card)
+            data.decks[title].questions.push(card)
             AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data))
         })
 }
@@ -34,8 +42,8 @@ export function removeEntry(title) {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
         .then((results) => {
             const data = Object.assign({}, JSON.parse(results))
-            data[title] = undefined
-            delete data[title]
+            data.decks[title] = undefined
+            delete data.decks[title]
             AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data))
         })
 }
@@ -44,7 +52,7 @@ export function answerQuestion(title, answer) {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
         .then((results) => {
             const data = JSON.parse(results)
-            data[title].answers.push(answer)
+            data.decks[title].answers.push(answer)
             AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data))
         })
 }
@@ -53,7 +61,7 @@ export function restartQuiz(title) {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
         .then((results) => {
             const data = JSON.parse(results)
-            data[title].answers = []
+            data.decks[title].answers = []
             AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data))
         })
 }
@@ -89,16 +97,13 @@ export function setLocalNotification() {
               if(status === 'granted') {
                 Notifications.cancelAllScheduledNotificationsAsync()
 
-                let tomorrow = new Date()
-                tomorrow.setDate(tomorrow.getDate + 1)
-                tomorrow.setHours(21)
-                tomorrow.setMinutes(30)
-
                 Notifications.scheduleNotificationAsync(
-                  { content: createNotification(), trigger: {
-                    time: tomorrow,
-                    repeat: 'day',
-                  } }
+                  {
+                    content: createNotification(),
+                    trigger: {                      
+                      hour: 20, minute: 30, repeats: true
+                    } 
+                  }
                 )
 
                 AsyncStorage.setItem(NOTIFICATION_KEY, JSON.stringify(true))
@@ -106,4 +111,5 @@ export function setLocalNotification() {
             })
         }
     })
+    .catch((error) => console.warn('Failed to register notification: ', error))
 }

@@ -1,4 +1,11 @@
-import { addCardToDeck, answerQuestion, getDeck, getDecks, removeEntry, restartQuiz } from "../utils/helpers";
+import {
+  addCardToDeck,
+  answerQuestion,
+  getDeck,
+  getDecks,
+  removeEntry,
+  restartQuiz,
+} from "../utils/helpers";
 
 export const RECEIVE_DECKS = "RECEIVE_DECKS";
 export const ADD_TITLE = "ADD_TITLE";
@@ -17,10 +24,11 @@ export function receiveDecks(decks) {
 
 export function handleReceiveDecks() {
   return (dispatch) => {
-    getDecks().then((decks) => {
-      console.log("API: ", decks);
-      dispatch(receiveDecks(decks));
-    });
+    getDecks()
+      .then((decks) => {
+        dispatch(receiveDecks(decks));
+      })
+      .catch((error) => console.warn(error));
   };
 }
 
@@ -41,9 +49,12 @@ export function addCard(title, card) {
 
 export function handleAddCardToDeck(title, card) {
   return (dispatch) => {
-    addCardToDeck(title, card).then(() => {
-      dispatch(addCard(title, card));
-    });
+    addCardToDeck(title, card)
+      .then(() => {
+        dispatch(addCard(title, card));
+        dispatch(selectDeck(title));
+      })
+      .catch((error) => console.warn(error));
   };
 }
 
@@ -56,9 +67,11 @@ export function deleteDeck(title) {
 
 export function handleDeleteDeck(title) {
   return (dispatch) => {
-    removeEntry(title).then(() => {
-      dispatch(deleteDeck(title));
-    });
+    removeEntry(title)
+      .then(() => {
+        dispatch(deleteDeck(title));
+      })
+      .catch((error) => console.warn(error));
   };
 }
 
@@ -71,11 +84,14 @@ export function answerQuestionAction(title, answer) {
 }
 
 export function handleAnswerQuestion(title, answer) {
-    return (dispatch) => {
-        answerQuestion(title, answer).then(() => {
-            dispatch(answerQuestionAction(title, answer))
-        })
-    }
+  return (dispatch) => {
+    answerQuestion(title, answer)
+      .then(() => {
+        dispatch(answerQuestionAction(title, answer));
+        dispatch(selectDeck(title))
+      })
+      .catch((error) => console.warn(error));
+  };
 }
 
 export function restartQuizAction(title) {
@@ -86,16 +102,19 @@ export function restartQuizAction(title) {
 }
 
 export function handleRestartQuiz(title) {
-    return (dispatch) => {
-        restartQuiz(title).then(() => {
-            dispatch(restartQuizAction(title))
-        })
-    }
+  return (dispatch) => {
+    restartQuiz(title)
+      .then(() => {
+        dispatch(restartQuizAction(title));
+        dispatch(selectDeck(title));
+      })
+      .catch((error) => console.warn(error));
+  };
 }
 
-export function selectDeck(deck) {
-    return {
-        type: SELECT_DECK,
-        deck
-    }
+export function selectDeck(title) {
+  return {
+    type: SELECT_DECK,
+    title,
+  };
 }

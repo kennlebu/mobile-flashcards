@@ -1,56 +1,64 @@
 import React, { Component } from "react";
 import { FlatList, Text, View } from "react-native";
 import { connect } from "react-redux";
-import { handleReceiveDecks } from "../actions";
+import { handleReceiveDecks, selectDeck } from "../actions";
 import styles from "../styles";
 import DeckListItem from "./DeckListItem";
 
 class DeckList extends Component {
   state = {
     loading: true,
-    decks: []
-  }
+    decks: [],
+  };
 
   componentDidMount() {
-    const { dispatch } = this.props
-      dispatch(handleReceiveDecks())
+    const { dispatch } = this.props;
+    dispatch(handleReceiveDecks());
   }
 
   render() {
-    const { decks } = this.props
+    const { decks, dispatch } = this.props;
 
     const myKeyExtractor = (deck) => {
-      return deck.title
-    }
+      return deck.title;
+    };
 
-    const renderItem = ({item}) => {
-       return <DeckListItem
-        key={item.title}
-        deck={item} 
-        navigate={() => this.props.navigation.navigate('Deck', { title: item.title })} />
-    }
+    const renderItem = ({ item }) => {
+      return (
+        <DeckListItem
+          key={item.title}
+          deck={item}
+          navigate={() => {
+            dispatch(selectDeck(item.title))
+            this.props.navigation.navigate("Deck", { title: item.title, refresh: true });
+          }}
+        />
+      );
+    };
 
     return (
       <View style={styles.container}>
-        {Object.keys(decks).length >= 1
-          ? <FlatList
-            data={Object.values(decks)} 
-            keyExtractor={myKeyExtractor} 
-            renderItem={renderItem} 
-            extraData={this.props.decks} />
-          :
-          <Text style={[styles.center, {fontSize: 28, textAlign: 'center'}]}>
+        {decks !== undefined && Object.keys(decks).length >= 1 ? (
+          <FlatList
+            data={Object.values(decks)}
+            keyExtractor={myKeyExtractor}
+            renderItem={renderItem}
+            extraData={this.props.decks}
+          />
+        ) : (
+          <Text style={[styles.center, { fontSize: 28, textAlign: "center" }]}>
             You have not added any decks yet.
-          </Text>}
+          </Text>
+        )}
       </View>
     );
   }
 }
 
-function mapStateToProps(decks) {
+function mapStateToProps({decks}) {
   return {
-    decks,
-  };
+    decks
+  }
 }
 
 export default connect(mapStateToProps)(DeckList);
