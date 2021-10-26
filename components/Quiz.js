@@ -28,9 +28,9 @@ class Quiz extends Component {
   };
   value = 0;
 
-  toggleView = () => {
+  toggleView = (screen) => {
     this.setState((prevState) => ({
-      screen: prevState.screen === "question" ? "answer" : "question",
+      screen: screen,
     }));
 
     this.state.animatedValue.addListener(({value}) => {
@@ -70,6 +70,8 @@ class Quiz extends Component {
     const { _selected_, dispatch } = this.props;
     const answerObject = { question, answer };
     const title = _selected_.title;
+
+    this.toggleView('question')
 
     dispatch(handleAnswerQuestion(title, answerObject));
   };
@@ -160,7 +162,7 @@ class Quiz extends Component {
                       styles.center,
                       { marginTop: 4, marginBottom: 50 },
                     ]}
-                    onPress={this.toggleView}
+                    onPress={() => this.toggleView(this.state.screen === "question" ? "answer" : "question")}
                   >
                     <Text style={{ color: red, fontSize: 16 }}>
                       Show {this.state.screen === "question" ? "Answer" : "Question"}
